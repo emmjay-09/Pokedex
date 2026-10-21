@@ -1,102 +1,135 @@
-import { useState } from "react";
-import React from "react";
-import { useEffect } from "react";
 import "./App.css";
+import { useState, useEffect } from "react";
 
-function Square({
-  value,
-  handleClick,
-}: {
-  value: string | null;
-  handleClick: () => void;
-}) {
-  return (
-    <button
-      className={`text-[50px] m-1 w-[60px]  h-[60px]  flex border border-gray-300 justify-center items-center ${value === "X" ? "text-red-500" : "text-blue-500"}`}
-      onClick={handleClick}
-    >
-      {value}
-    </button>
-  );
-}
-
-function Board() {
-  const [value, setValue] = useState(true);
-  const [squares, setSquares] = useState<(string | null)[]>(
-    Array(9).fill(null),
-  );
-  const [savedValue, setSavedValue] = useState<(string | null)[]>(
-    Array(9).fill(null),
-  );
-  const [running, setRunning] = useState(true);
-  useEffect(() => {
-    checkWinner(squares);
-  }, [squares]);
-  const winningMoves: number[][] = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
+export default function Pokemon() {
+  const [pokemon, setPokemon] = useState<any>(null);
+  const [specie, setSpecie] = useState<any>(null);
+  const [search, setSearch] = useState<string>("charmeleon");
+  const [error, setError] = useState<string>("");
+  const elements = [
+    { id: 1, name: "Fire", color: "#F08030" },
+    { id: 2, name: "Water", color: "#6890F0" },
+    { id: 3, name: "Grass", color: "#78C850" },
+    { id: 4, name: "Electric", color: "#F8D030" },
+    { id: 5, name: "Psychic", color: "#F85888" },
+    { id: 6, name: "Ice", color: "#90E0E0" },
+    { id: 7, name: "Dragon", color: "#7038F8" },
+    { id: 8, name: "Dark", color: "#705848" },
+    { id: 9, name: "Fairy", color: "#EE99AC" },
+    { id: 10, name: "Normal", color: "#A8A878" },
+    { id: 11, name: "Fighting", color: "#C03028" },
+    { id: 12, name: "Flying", color: "#A8A878" },
+    { id: 13, name: "Poison", color: "#A040A0" },
+    { id: 14, name: "Ground", color: "#E0C068" },
+    { id: 15, name: "Rock", color: "#B8B878" },
+    { id: 16, name: "Bug", color: "#A8B820" },
+    { id: 17, name: "Ghost", color: "#705848" },
+    { id: 18, name: "Steel", color: "#B8B878" },
   ];
+  const [loading, setLoading] = useState<any>();
 
-  function checkWinner(squares: (string | null)[]) {
-    const list = winningMoves.map((move, index) => {
-      const [a, b, c] = move;
-      if (
-        squares[a] &&
-        squares[a] === squares[b] &&
-        squares[a] === squares[c]
-      ) {
-        setRunning(false);
-        setValue(!value);
-        setSavedValue(squares);
-        setSquares(savedValue);
+  const [isHovered, setIsHovered] = useState("");
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [pokemonResponse, specieResponse] = await Promise.all([
+          fetch(`https://pokeapi.co/api/v2/pokemon/${search}`),
+          fetch(`https://pokeapi.co/api/v2/pokemon-species/${search}`),
+        ]);
+
+        setLoading(true);
+        if (!pokemonResponse.ok || !specieResponse.ok) {
+          throw new Error("Pokemon not found");
+        }
+        const pokemonData = await pokemonResponse.json();
+        const specieData = await specieResponse.json();
+        setPokemon(pokemonData);
+        setSpecie(specieData);
+      } catch {
+        setError("Pokemon not found. Try another name!");
+      } finally {
+        setLoading(false);
       }
-      return null;
-    });
-  }
-
-  function handleClick(i: number) {
-    setSquares((currentSquares) => {
-      if (currentSquares[i] !== null) return currentSquares;
-      const newSquares = currentSquares.slice();
-      setValue(!value);
-      newSquares[i] = value ? "X" : "O";
-      return newSquares;
-    });
-  }
+    }
+    fetchData();
+  }, [search]);
+  console.log(pokemon);
   return (
-    <>
-      <div
-        className={`flex text-xl font-bold mb-5 ${value ? "text-red-500" : "text-blue-500"}`}
-      >
-        {running ? (
-          <div>Next player: {value ? "X" : "O"}</div>
-        ) : (
-          <div>Game Over: {value ? "X" : "O"} WINS</div>
-        )}
-      </div>
-      <div className="flex flex-wrap">
-        <Square value={squares[0]} handleClick={() => handleClick(0)} />
-        <Square value={squares[1]} handleClick={() => handleClick(1)} />
-        <Square value={squares[2]} handleClick={() => handleClick(2)} />
-      </div>
-      <div className="flex flex-wrap w-[300px]">
-        <Square value={squares[3]} handleClick={() => handleClick(3)} />
-        <Square value={squares[4]} handleClick={() => handleClick(4)} />
-        <Square value={squares[5]} handleClick={() => handleClick(5)} />
-      </div>
-      <div className="flex flex-wrap w-[300px]">
-        <Square value={squares[6]} handleClick={() => handleClick(6)} />
-        <Square value={squares[7]} handleClick={() => handleClick(7)} />
-        <Square value={squares[8]} handleClick={() => handleClick(8)} />
-      </div>
-    </>
+    <div className="flex flex-col relative items-center bg-[#FFFDD0] h-[1500px] w-[1000px] rounded-[100px] shadow-lg">
+      {error && <p className="text-red-500">{error}</p>}
+      {pokemon && !error && (
+        <>
+          <div className="flex w-[100%] h-[30%] p-10">
+            <img
+              className="bg-white rounded-[10%] p-5 shadow-lg "
+              src={pokemon.sprites.front_default}
+              alt={pokemon.name}
+            />
+            <div className="ml-10 flex flex-col items-start leading-15 pl-10 pr-10">
+              <span className="text-[#C0C0C0] text-[50px]">
+                NO. {pokemon.id}
+              </span>
+              <span className="text-[60px]">{pokemon.name.toUpperCase()}</span>
+              <div className="text-xl font-bold">
+                {pokemon.types.map((type: any) => {
+                  const selectedElement = elements.find(
+                    (element) => element.name.toLowerCase() === type.type.name,
+                  );
+                  return (
+                    <div
+                      className={`inline-block text-black text-[50px] p-5 mt-10 rounded-full mr-2 hover:text-white transition-colors duration-300`}
+                      onMouseEnter={() => setIsHovered(type.type.name)}
+                      onMouseLeave={() => setIsHovered("")}
+                      style={{
+                        backgroundColor:
+                          isHovered === type.type.name
+                            ? selectedElement?.color
+                            : "#d2c4f2",
+                      }}
+                      key={type.type.name}
+                    >
+                      {type.type.name}{" "}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <input
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setSearch(e.currentTarget.value.toLowerCase());
+                }
+              }}
+              placeholder="Type pokemon name here"
+              type="text"
+            />
+          </div>
+          <div className="flex flex-col items-start w-[100%] h-[70%] p-10">
+            <h1>Pokedex entry</h1>
+            <div className="text-[50px] leading-15 tracking-[5px] text-start">
+              {specie?.flavor_text_entries[0].flavor_text}
+            </div>
+          </div>
+          <div className="p-10">
+            <h1 className="text-[70px]">STATS</h1>
+            {pokemon.stats.map((type: any) => {
+              const width = type.base_stat % 100;
+              return (
+                <div className="grid grid-cols-3 gap-4" key={type.stat.name}>
+                  <h1 className="text-start text-[40px]">{type.stat.name}</h1>
+                  <div className="w-[400px] h-[10px] relative bg-white mt-[15%]">
+                    <div className={`h-[10px] absolute bg-blue-500`}></div>
+                  </div>
+                  <div className="text-[50px] flex flex-col justify-center text-end">
+                    {type.base_stat}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </div>
   );
 }
-
-export default Board;
