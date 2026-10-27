@@ -86,9 +86,9 @@ export default function Pokemon() {
       ));
 
   return (
-    <section className="flex w-max p-3">
-      <div className="m-20 text-[40px] flex flex-col">
-        <div className="mb-20">
+    <section className="flex w-full max-w-[1400px] mx-auto flex-col gap-6 p-3 lg:flex-row lg:gap-10">
+      <div className="flex w-full flex-col text-xl lg:m-10 lg:w-[360px] lg:shrink-0 lg:text-[28px]">
+        <div className="mb-8 lg:mb-20">
           <input
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -99,11 +99,11 @@ export default function Pokemon() {
             type="text"
           />
         </div>
-        <div className="grid grid-cols-6 gap-4">
+        <div className="grid grid-cols-6 gap-2 lg:gap-4">
           {letters.map((letter) => (
             <button
               key={letter}
-              className="bg-[#d2c4f2] text-black font-bold p-4 rounded shadow-lg transition-colors duration-300"
+              className="rounded bg-[#d2c4f2] p-2 font-bold text-black shadow-lg transition-colors duration-300 lg:p-4"
               style={{
                 backgroundColor: color,
               }}
@@ -116,28 +116,28 @@ export default function Pokemon() {
 
         <div className="mt-10">
           {currentletter ? (
-            <div className="border-10 border-gray-200 p-10 overflow-auto overflow-x-hidden flex flex-col items-start h-[1000px]">
+            <div className="flex h-[400px] flex-col items-start overflow-auto overflow-x-hidden border-10 border-gray-200 p-4 lg:h-[1000px] lg:p-10">
               {handleFilter()}
             </div>
           ) : null}
         </div>
       </div>
-      <div className="flex flex-col relative items-center bg-[#FFFDD0] h-[1500px] w-[1000px] rounded-[100px] shadow-lg">
-        {error && <p className="text-red-500 text-[50px]">{error}</p>}
-        {loading && <p className="text-[50px] text-gray-500">Loading...</p>}
+      <div className="relative flex min-h-screen w-full max-w-[1000px] flex-col items-center rounded-[40px] bg-[#FFFDD0] p-4 shadow-lg lg:rounded-[100px] lg:p-0">
+        {error && <p className="text-center text-2xl text-red-500 lg:text-[50px]">{error}</p>}
+        {loading && <p className="text-2xl text-gray-500 lg:text-[50px]">Loading...</p>}
         {!loading && pokemon && !error && (
           <>
-            <div className="flex w-[100%] h-[30%] p-10">
+            <div className="flex w-full flex-col gap-6 p-4 sm:flex-row lg:h-[30%] lg:p-10">
               <img
-                className="bg-white rounded-[10%] p-5 shadow-lg "
+                className="w-40 self-center rounded-[10%] bg-white p-5 shadow-lg sm:self-start lg:w-auto"
                 src={pokemon.sprites.front_default}
                 alt={pokemon.name}
               />
-              <div className="ml-10 flex flex-col items-start leading-15 pl-10 pr-10">
-                <span className="text-[#C0C0C0] text-[50px]">
+              <div className="flex flex-col items-start sm:ml-4 lg:ml-10 lg:pl-10 lg:pr-10">
+                <span className="text-2xl text-[#C0C0C0] lg:text-[50px]">
                   NO. {pokemon.id}
                 </span>
-                <span className="text-[60px]">
+                <span className="text-3xl lg:text-[60px]">
                   {pokemon.name.toUpperCase()}
                 </span>
                 <div className="text-xl font-bold">
@@ -148,7 +148,7 @@ export default function Pokemon() {
                     );
                     return (
                       <div
-                        className={`inline-block text-black text-[50px] p-5 mt-10 rounded-full mr-2 hover:text-white transition-colors duration-300`}
+                        className={`mr-2 mt-4 inline-block rounded-full p-3 text-2xl text-black transition-colors duration-300 hover:text-white lg:mt-10 lg:p-5 lg:text-[50px]`}
                         onMouseEnter={() => setIsHovered(type.type.name)}
                         onMouseLeave={() => setIsHovered("")}
                         style={{
@@ -166,21 +166,21 @@ export default function Pokemon() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col items-start w-[100%] h-[70%] p-10">
+            <div className="flex w-full flex-col items-start p-4 lg:h-[70%] lg:p-10">
               <h1>Pokedex entry</h1>
-              <div className="text-[50px] leading-15 tracking-[5px] text-start">
+              <div className="text-2xl leading-normal tracking-wide text-start lg:text-[50px] lg:leading-15 lg:tracking-[5px]">
                 {specie?.flavor_text_entries[0].flavor_text}
               </div>
             </div>
-            <div className="p-10" key={pokemon.id}>
-              <h1 className="text-[70px]">STATS</h1>
+            <div className="p-4 lg:p-10" key={pokemon.id}>
+              <h1 className="text-4xl lg:text-[70px]">STATS</h1>
               {pokemon.stats.map((type: any) => {
                 const width = type.base_stat;
 
                 return (
-                  <div className="grid grid-cols-3 gap-4" key={type.stat.name}>
-                    <h1 className="text-start text-[40px]">{type.stat.name}</h1>
-                    <div className="w-[400px] h-[10px] relative bg-white mt-[15%]">
+                  <div className="grid grid-cols-[minmax(90px,1fr)_minmax(100px,2fr)_50px] gap-2 lg:grid-cols-3 lg:gap-4" key={type.stat.name}>
+                    <h1 className="text-start text-xl lg:text-[40px]">{type.stat.name}</h1>
+                    <div className="relative mt-[15%] h-[10px] w-full bg-white lg:w-[400px]">
                       <div
                         className={`h-[10px] absolute bg-blue-500`}
                         style={{
@@ -191,7 +191,7 @@ export default function Pokemon() {
                         }}
                       ></div>
                     </div>
-                    <div className="text-[50px] flex flex-col justify-center text-end">
+                    <div className="flex flex-col justify-center text-end text-2xl lg:text-[50px]">
                       {type.base_stat}
                     </div>
                   </div>
