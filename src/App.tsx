@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function Pokemon() {
   const [pokemon, setPokemon] = useState<any>(null);
@@ -9,6 +9,8 @@ export default function Pokemon() {
   const [currentletter, setCurrentLetter] = useState<string>("");
   const [fullData, setFullData] = useState<{ name: string; url: string }[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const statsRef = useRef<HTMLDivElement>(null);
+  const previousSearch = useRef(search);
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
   const elements = [
     { id: 1, name: "Fire", color: "#F08030" },
@@ -67,6 +69,18 @@ export default function Pokemon() {
     fetchData();
   }, [search]);
 
+  useEffect(() => {
+    if (
+      previousSearch.current !== search &&
+      !loading &&
+      pokemon &&
+      statsRef.current
+    ) {
+      statsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      previousSearch.current = search;
+    }
+  }, [loading, pokemon, search]);
+
   const handleFilter = () =>
     fullData
       .filter((pokemon) => pokemon.name.startsWith(currentletter.toLowerCase()))
@@ -77,7 +91,7 @@ export default function Pokemon() {
         >
           <button
             onClick={() => setSearch(pokemon.name)}
-            className="m-4 hover:bg-[#d2c4f2] rounded p-2 text-black transition-colors duration-300"
+            className="m-4 hover:bg-[#d2c4f2] focus:bg-[#c0c0c0] rounded p-2 text-black transition-colors duration-300"
             key={pokemon.name}
           >
             {pokemon.name}{" "}
@@ -86,9 +100,9 @@ export default function Pokemon() {
       ));
 
   return (
-    <section className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 p-3 lg:flex-row lg:gap-6">
-      <div className="flex w-full flex-col text-base lg:m-6 lg:w-[280px] lg:shrink-0 lg:text-lg">
-        <div className="mb-8">
+    <section className="mx-auto flex w-full max-w-[1000px] flex-col gap-3 p-2 text-sm lg:flex-row lg:gap-4">
+      <div className="flex w-full flex-col lg:m-3 lg:w-[220px] lg:shrink-0">
+        <div className="mb-4">
           <input
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -103,7 +117,7 @@ export default function Pokemon() {
           {letters.map((letter) => (
             <button
               key={letter}
-              className="rounded bg-[#d2c4f2] p-2 font-bold text-black shadow-lg transition-colors duration-300"
+              className="rounded bg-[#d2c4f2] p-1 text-sm font-bold text-black shadow-lg transition-colors duration-300"
               style={{
                 backgroundColor: color,
               }}
@@ -116,31 +130,33 @@ export default function Pokemon() {
 
         <div className="mt-10">
           {currentletter ? (
-            <div className="flex h-[400px] flex-col items-start overflow-auto overflow-x-hidden border-10 border-gray-200 p-4">
+            <div className="flex h-[260px] flex-col items-start overflow-auto overflow-x-hidden border-4 border-gray-200 p-2">
               {handleFilter()}
             </div>
           ) : null}
         </div>
       </div>
-      <div className="relative flex min-h-[600px] w-full max-w-[760px] flex-col items-center rounded-[40px] bg-[#FFFDD0] p-4 shadow-lg xl:max-w-[1000px] xl:rounded-[100px] xl:p-0">
-        {error && <p className="text-center text-2xl text-red-500 xl:text-[50px]">{error}</p>}
-        {loading && <p className="text-2xl text-gray-500 xl:text-[50px]">Loading...</p>}
+      <div className="relative flex h-fit w-full max-w-[620px] flex-col items-center rounded-[24px] bg-[#FFFDD0] p-2 shadow-lg">
+        {error && (
+          <p className="text-center text-lg text-red-500">{error}</p>
+        )}
+        {loading && <p className="text-lg text-gray-500">Loading...</p>}
         {!loading && pokemon && !error && (
           <>
-            <div className="flex w-full flex-col gap-6 p-4 sm:flex-row xl:h-[30%] xl:p-10">
+            <div className="flex w-full flex-col gap-1 p-1 sm:flex-row">
               <img
-                className="w-40 self-center rounded-[10%] bg-white p-5 shadow-lg sm:self-start xl:w-auto"
+                className="w-24 self-center rounded-[10%] bg-white p-1 shadow-lg sm:self-start"
                 src={pokemon.sprites.front_default}
                 alt={pokemon.name}
               />
-              <div className="flex flex-col items-start sm:ml-4 xl:ml-10 xl:pl-10 xl:pr-10">
-                <span className="text-2xl text-[#C0C0C0] xl:text-[50px]">
+              <div className="flex flex-col items-start sm:ml-1">
+                <span className="text-base text-[#C0C0C0]">
                   NO. {pokemon.id}
                 </span>
-                <span className="text-3xl xl:text-[60px]">
+                <span className="text-2xl font-bold">
                   {pokemon.name.toUpperCase()}
                 </span>
-                <div className="text-xl font-bold">
+                <div className="text-base font-bold">
                   {pokemon.types.map((type: any) => {
                     const selectedElement = elements.find(
                       (element) =>
@@ -148,7 +164,7 @@ export default function Pokemon() {
                     );
                     return (
                       <div
-                        className={`mr-2 mt-4 inline-block rounded-full p-3 text-2xl text-black transition-colors duration-300 hover:text-white xl:mt-10 xl:p-5 xl:text-[50px]`}
+                        className="mr-1 mt-0.5 inline-block rounded-full p-1 text-sm text-black transition-colors duration-300 hover:text-white"
                         onMouseEnter={() => setIsHovered(type.type.name)}
                         onMouseLeave={() => setIsHovered("")}
                         style={{
@@ -166,23 +182,28 @@ export default function Pokemon() {
                 </div>
               </div>
             </div>
-            <div className="flex w-full flex-col items-start p-4 xl:h-[70%] xl:p-10">
-              <h1>Pokedex entry</h1>
-              <div className="text-2xl leading-normal tracking-wide text-start xl:text-[50px] xl:leading-15 xl:tracking-[5px]">
+            <div className="flex w-full flex-col items-start p-1">
+              <h1 className="text-base font-semibold">Pokedex entry</h1>
+              <div className="text-base leading-tight text-start">
                 {specie?.flavor_text_entries[0].flavor_text}
               </div>
             </div>
-            <div className="p-4 xl:p-10" key={pokemon.id}>
-              <h1 className="text-4xl xl:text-[70px]">STATS</h1>
+            <div className="w-full p-1" key={pokemon.id} ref={statsRef}>
+              <h1 className="text-3xl font-bold">STATS</h1>
               {pokemon.stats.map((type: any) => {
                 const width = type.base_stat;
 
                 return (
-                  <div className="grid grid-cols-[minmax(90px,1fr)_minmax(100px,2fr)_50px] gap-2 xl:grid-cols-3 xl:gap-4" key={type.stat.name}>
-                    <h1 className="text-start text-xl xl:text-[40px]">{type.stat.name}</h1>
-                    <div className="relative mt-[15%] h-[10px] w-full bg-white xl:w-[400px]">
+                  <div
+                    className="grid grid-cols-[minmax(75px,1fr)_minmax(80px,2fr)_32px] items-center gap-1"
+                    key={type.stat.name}
+                  >
+                    <h1 className="text-start text-base">
+                      {type.stat.name}
+                    </h1>
+                    <div className="relative h-1.5 w-full bg-white">
                       <div
-                        className={`h-[10px] absolute bg-blue-500`}
+                        className="absolute h-1.5 bg-blue-500"
                         style={{
                           width: `${width}%`,
                           animation: "grow-stat 2s ease forwards",
@@ -191,7 +212,7 @@ export default function Pokemon() {
                         }}
                       ></div>
                     </div>
-                    <div className="flex flex-col justify-center text-end text-2xl xl:text-[50px]">
+                    <div className="flex flex-col justify-center text-end text-base">
                       {type.base_stat}
                     </div>
                   </div>
